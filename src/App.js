@@ -8,12 +8,25 @@ import './App.css';
 
 
 class App extends Component {
-  
-  componentDidMount() {
+  constructor(props) {
+    super(props);
 
+    this.state = { place: '' };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  
+  handleChange(e) {
+    this.setState({ place: e.target.value });
+  }
+  
+  handleSubmit(e) {
+    e.preventDefault();
   }
 
   render() {
+    console.log('this.state', this.state)
     return (
       <div className="App">
         <header className="App-header">
@@ -23,8 +36,8 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
-        <SearchPlacesInput />
-        <Map />
+        <SearchPlacesInput handleChange={this.handleChange} handleSubmit={this.handleSubmit}/>
+        <Map place={this.state.place}/>
       </div>
     );
   }
