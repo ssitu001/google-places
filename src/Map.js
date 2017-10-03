@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 class Map extends Component {
 
   componentDidMount() {
+    console.log('window.google.maps', window.google.maps.Marker)
     if (!window.google.maps.places) {
       throw new Error('Google Maps Place Library not loaded correctly');
     }
@@ -15,7 +16,18 @@ class Map extends Component {
       },
     };
 
-    this.map = new window.google.maps.Map(this.mapElementRef, mapOpts)
+    
+    this.map = new window.google.maps.Map(this.mapElementRef, mapOpts);
+
+    const markerOpts = {
+      map: this.map,
+      position: {
+        lat: 37.7749,
+        lng: -122.4194,
+      },
+    };
+
+    this.marker = new window.google.maps.Marker(markerOpts);
   }
 
   render() {
