@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 
 import SearchPlacesInput from './SearchPlacesInput';
-// import Map from './Map';
 import PlacesList from './PlacesList';
 
 import './App.css';
@@ -15,48 +14,41 @@ class App extends Component {
     this.state = { 
       place: '' ,
       places: [],
-      currentLocation: {lat: 37.7749, lng: -122.4194},
+      currentLocation: {lat: null, lng: null},
       markers: [],
     };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-
-    this.displayInfoFromListItem = this.displayInfoFromListItem.bind(this);
   }
 
   componentDidMount() {
-    // if (navigator.geolocation) {
-    //   console.log('Geolocation is supported!');
-    //   this.currentPosPromise = new Promise((resolve, reject) => {
-    //     navigator.geolocation.getCurrentPosition(resolve, reject);
-    //   });
+    this.setUserLocation();
+  }
 
-    //   this.currentPosPromise 
-    //     .then((pos) => {
-    //       console.log('pos:::', pos);
-    //       this.setState({
-    //         currentLocation: {
-    //           lat: pos.coords.latitude,
-    //           lng: pos.coords.longitude,
-    //         }
-    //       });
-    //     })
-    //     .catch((err) => {
-    //       console.log('err::::', err);
-    //     });
+  setUserLocation() {
+    if (navigator.geolocation) {
+      console.log('Geolocation is supported!');
+      const currentPosPromise = new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
 
-      // navigator.geolocation.getCurrentPosition((position) => {
-      //   console.log('position:::', position);
-      //   this.currentPosLat = position.coords.latitude;
-      //   this.currentPosLon = position.coords.longitude;
-      // });
-    // }
-    // else {
-    //   console.log('Geolocation is not supported for this Browser/OS.');
-    // }
-
-    this.loadMap();
+      return currentPosPromise 
+        .then((pos) => {
+          this.setState({
+            currentLocation: {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+            }
+          });
+        })
+        .then(() => {
+          this.loadMap();
+        })
+        .catch((err) => {
+          console.log('err::::', err);
+        });
+    }
+    else {
+      console.log('Geolocation is not supported for this Browser/OS.');
+    }
   }
 
   loadMap() {
@@ -70,43 +62,61 @@ class App extends Component {
     this.map = new window.google.maps.Map(this.mapElementRef, mapOpts);
   }
   
-  handleChange(e) {
+  handleChange = (e) => {
     this.setState({ place: e.target.value });
   }
   
-  handleSubmit(e) {
+  handleSubmit = (e) => {
     e.preventDefault();
     this.searchPlaces();
   }
 
-  searchPlaces(place) {
-    this.service = new window.google.maps.places.PlacesService(this.map);
-    
-    const location = new window.google.maps.LatLng(37.7749, -122.4194);
+  searchPlaces() {
+    const placesService = new window.google.maps.places.PlacesService(this.map);
+    const location = new window.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng);
     const placeToQuery = this.state.place;
-
+    const cachedResults = JSON.parse(localStorage.getItem(placeToQuery));
     const request = {
       location: location,
       query: placeToQuery,
       radius: '100',
     }
-    this.service.textSearch(request, (results, status) => {
-      if (status === 'OK') {
-        console.log('results::', results);
-        this.getMarkers(results);
-        this.setState({places: [...results]});
-      }
-    });
+
+    // validate input
+    if (!placeToQuery) {
+      return;
+    }
+
+    console.log('cachedResults', cachedResults)
+    if (cachedResults) {
+      this.displayResults(cachedResults)
+    } else {
+      placesService.textSearch(request, (results, status) => {
+        if (status === 'OK') {
+          console.log('results::', results);
+          this.cacheResults(request.query, results);
+        } else {
+          console.log('error yo')
+        }
+      });
+    }
+  }
+
+  cacheResults(query, results) {
+    localStorage.setItem(query, JSON.stringify(results));
+    this.displayResults(results);
+  }
+
+  displayResults(places) {
+    this.getMarkers(places);
+    this.setState({ places });
   }
 
   getMarkers(places) {
+    const markers = places.map((place) => this.setMarkers(place));
     this.infoWindow = new window.google.maps.InfoWindow();
     
-    const markers = places.map((place) => {
-      return this.setMarkers(place);
-    });
-
-    this.setState({markers: [...markers]}) 
+    this.setState({ markers });
   }
 
   setMarkers(place) {
@@ -136,10 +146,10 @@ class App extends Component {
 
   }
 
-  displayInfoFromListItem(idx) {
-    const markersFromState = this.state.markers;
+  displayInfoFromListItem = (idx) => {
+    const { markers } = this.state;
 
-    new window.google.maps.event.trigger(markersFromState[idx], 'click');
+    new window.google.maps.event.trigger(markers[idx], 'click');
   }
 
   render() {
@@ -149,7 +159,10 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <SearchPlacesInput handleChange={this.handleChange} handleSubmit={this.handleSubmit}/>
+        <SearchPlacesInput 
+          handleChange={this.handleChange} 
+          handleSubmit={this.handleSubmit}
+        />
 
       <div className="container">
         <div className="row">
@@ -159,7 +172,10 @@ class App extends Component {
             </div>
           </div>
           <div className="col-xs-4">
-            <PlacesList places={this.state.places} displayInfoFromListItem={this.displayInfoFromListItem}/>
+            <PlacesList 
+              places={this.state.places} 
+              displayInfoFromListItem={this.displayInfoFromListItem}
+            />
           </div>
         </div>
       </div>
