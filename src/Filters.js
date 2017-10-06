@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Filters = ({displayOpenNow, filterPrice}) => {
+const Filters = ({displayAll, displayOpenNow, filterPrice}) => {
   const pricingButtons = ['$', '$$', '$$$', '$$$$'].map((price, i) => 
     <button
       onClick={() => filterPrice(i+1)}
@@ -11,6 +11,7 @@ const Filters = ({displayOpenNow, filterPrice}) => {
 
   return (
     <div>
+      <button onClick={() => displayAll()}>All</button>
       <button onClick={() => displayOpenNow()}>Open Now</button>
       {pricingButtons}
     </div>
