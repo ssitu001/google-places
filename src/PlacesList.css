@@ -1,0 +1,6 @@
+.places-content {
+  height: 500px;
+  flex: 1;
+  overflow-y: scroll;
+  cursor: pointer;
+}
