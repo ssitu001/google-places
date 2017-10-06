@@ -3,6 +3,7 @@ import logo from './logo.svg';
 
 import SearchPlacesInput from './SearchPlacesInput';
 import PlacesList from './PlacesList';
+import Filters from './Filters';
 
 import './App.css';
 
@@ -12,10 +13,14 @@ class App extends Component {
     super(props);
 
     this.state = { 
-      place: '' ,
+      place: '',
       places: [],
       currentLocation: {lat: null, lng: null},
       markers: [],
+      filters: {
+        openNow: false,
+        pricing: null,
+      },
     };
   }
 
@@ -72,7 +77,7 @@ class App extends Component {
   }
 
   searchPlaces() {
-    const placesService = new window.google.maps.places.PlacesService(this.map);
+    this.placesService = new window.google.maps.places.PlacesService(this.map);
     const location = new window.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng);
     const placeToQuery = this.state.place;
     const cachedResults = JSON.parse(localStorage.getItem(placeToQuery));
@@ -91,7 +96,7 @@ class App extends Component {
     if (cachedResults) {
       this.displayResults(cachedResults)
     } else {
-      placesService.textSearch(request, (results, status) => {
+      this.placesService.textSearch(request, (results, status) => {
         if (status === 'OK') {
           console.log('results::', results);
           this.cacheResults(request.query, results);
@@ -113,7 +118,11 @@ class App extends Component {
   }
 
   getMarkers(places) {
-    const markers = places.map((place) => this.setMarkers(place));
+    // const { pricing } = this.state.filters;
+    const markers = places.map((place) => {
+      return this.setMarkers(place)
+    });
+
     this.infoWindow = new window.google.maps.InfoWindow();
     
     this.setState({ markers });
@@ -143,42 +152,100 @@ class App extends Component {
     })
 
     return marker;
-
   }
 
   displayInfoFromListItem = (idx) => {
     const { markers } = this.state;
-
+    console.log('markers', markers)
     new window.google.maps.event.trigger(markers[idx], 'click');
   }
 
+  displayAll = () => {
+    this.setState({
+      filters: {
+        openNow: false,
+        pricing: null,
+      }
+    });
+  }
+
+  displayOpenNow = () => {
+    const { openNow } = this.state.filters;
+
+    this.setFilterState(!openNow, null);
+  }
+
+  filterPrice = (price) => {
+    this.setFilterState(false, price);
+  }
+
+  setFilterState(open, price) {
+    const { openNow, pricing } = this.state.filters;
+    
+    this.setState({
+      filters: {
+        openNow: open,
+        pricing: price,
+      },
+    })
+  }
+  
   render() {
+    console.log('this.state', this.state.filters)
+    const { openNow, pricing } = this.state.filters;
+    let filteredPlaces = this.state.places;
+    
+    if (openNow && pricing) {
+      filteredPlaces = this.state.places.filter((place) => 
+        place.opening_hours.open_now && place.price_level === pricing
+      );
+    }
+
+    if (openNow) {
+      filteredPlaces = this.state.places.filter((place) => place.opening_hours.open_now);
+    }
+
+    if (pricing) {
+      filteredPlaces = this.state.places.filter((place) => place.price_level === pricing);
+    }
+
     return (
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Welcome to Places</h1>
         </header>
-        <SearchPlacesInput 
-          handleChange={this.handleChange} 
-          handleSubmit={this.handleSubmit}
-        />
 
-      <div className="container">
-        <div className="row">
-          <div className="col-xs-8">
-            <div className="map" ref={(domEl) => {this.mapElementRef = domEl}}>
-              
+        <div className="container">
+          <div className="row">
+            <div className="col-sm-6">
+              <SearchPlacesInput 
+                handleChange={this.handleChange} 
+                handleSubmit={this.handleSubmit}
+              />
+            </div>
+            <div className="col-sm-6">
+              <Filters 
+                displayAll={this.displayAll}
+                displayOpenNow={this.displayOpenNow}
+                filterPrice={this.filterPrice}
+              />
             </div>
           </div>
-          <div className="col-xs-4">
-            <PlacesList 
-              places={this.state.places} 
-              displayInfoFromListItem={this.displayInfoFromListItem}
-            />
+          <div className="row">
+            <div className="col-sm-8">
+              <div className="map" ref={(domEl) => {this.mapElementRef = domEl}}>
+                Loading...
+              </div>
+            </div>
+            <div className="col-sm-4">
+              <PlacesList 
+                places={filteredPlaces} 
+                displayInfoFromListItem={this.displayInfoFromListItem}
+              />
+            </div>
           </div>
         </div>
-      </div>
       </div>
     );
   }
