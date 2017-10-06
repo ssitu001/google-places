@@ -2,15 +2,20 @@ import React from 'react';
 
 import PlacesListItem from './PlacesListItem';
 
-const PlacesList = (props) => {
-  
-  const placesList = props.places.map((place, i) =>
-    <PlacesListItem key={i} place={place}/>
-  );
+import './PlacesList.css';
+
+const PlacesList = ({places, displayInfoFromListItem}) => {
 
   return (
-    <div>
-      {placesList}
+    <div className="list-group places-content">
+      {places.map((place, i) =>
+        <PlacesListItem 
+          key={i} 
+          index={i} 
+          place={place} 
+          displayInfoFromListItem={displayInfoFromListItem}
+        />
+      )}
     </div>
   )
 }
