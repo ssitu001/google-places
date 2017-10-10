@@ -1,20 +1,39 @@
 import React from 'react';
 
-const Filters = ({displayAll, displayOpenNow, filterPrice}) => {
+
+import './Filters.css';
+import { ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
+
+const Filters = ({displayAll, displayOpenNow, filterPrice, openNowButtonActive, filterButtonsActive}) => {
   const pricingButtons = ['$', '$$', '$$$', '$$$$'].map((price, i) => 
-    <button
+    <Button
+      bsSize="small"
       onClick={() => filterPrice(i+1)}
-      key={i}>
+      key={i}
+      className={filterButtonsActive.includes(i+1) ? 'button-active' : ''}>
       {price}
-    </button>
+    </Button>
   );
 
+  console.log('openNowButtonActive', openNowButtonActive)
   return (
-    <div>
-      <button onClick={() => displayAll()}>All</button>
-      <button onClick={() => displayOpenNow()}>Open Now</button>
-      {pricingButtons}
-    </div>
+    <ButtonToolbar>
+      <ButtonGroup>
+        <Button
+          bsSize="small"
+          onClick={() => displayAll()}
+          className={openNowButtonActive || filterButtonsActive.length ? '' : 'button-active'}>
+          All
+        </Button>
+        <Button
+          bsSize="small" 
+          onClick={() => displayOpenNow()}
+          className={openNowButtonActive ? 'button-active' : ''}>
+          Open Now
+        </Button>
+        {pricingButtons}
+      </ButtonGroup>
+    </ButtonToolbar>
   )
 }
 

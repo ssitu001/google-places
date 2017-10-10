@@ -1,0 +1,12 @@
+button {
+  border: none;
+}
+
+button:focus {
+  outline: none
+}
+
+.button-active {
+  background: blue;
+}
+
