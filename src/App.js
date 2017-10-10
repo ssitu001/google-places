@@ -19,8 +19,9 @@ class App extends Component {
       markers: [],
       filters: {
         openNow: false,
-        pricing: null,
+        pricing: [],
       },
+      filteredPlaces: [],
     };
   }
 
@@ -76,7 +77,7 @@ class App extends Component {
     this.searchPlaces();
   }
 
-  searchPlaces() {
+  searchPlaces(distance) {
     this.placesService = new window.google.maps.places.PlacesService(this.map);
     const location = new window.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng);
     const placeToQuery = this.state.place;
@@ -92,7 +93,6 @@ class App extends Component {
       return;
     }
 
-    console.log('cachedResults', cachedResults)
     if (cachedResults) {
       this.displayResults(cachedResults)
     } else {
@@ -133,7 +133,8 @@ class App extends Component {
       <div class="container">
         <div class="row">
           <div class="col-xs-12">
-            <div>${place.formatted_address}</div>
+            <h5>${place.name}</h5>
+            <p>${place.formatted_address}</p>
           </div>
         </div>
       </div>
@@ -156,7 +157,6 @@ class App extends Component {
 
   displayInfoFromListItem = (idx) => {
     const { markers } = this.state;
-    console.log('markers', markers)
     new window.google.maps.event.trigger(markers[idx], 'click');
   }
 
@@ -164,51 +164,85 @@ class App extends Component {
     this.setState({
       filters: {
         openNow: false,
-        pricing: null,
+        pricing: [],
       }
     });
   }
 
   displayOpenNow = () => {
-    const { openNow } = this.state.filters;
+    const { openNow, pricing } = this.state.filters;
+    // this.getMarkers([]);
 
-    this.setFilterState(!openNow, null);
+    if (openNow) {
+      this.filteredPlaces = this.state.places.filter((place) => {
+        return place.opening_hours.open_now;
+      });
+      this.getMarkers(this.filteredPlaces);
+    }
+
+    this.setState({
+      filters: {
+        openNow: !openNow,
+        pricing: pricing,
+      }
+    });
   }
 
   filterPrice = (price) => {
-    this.setFilterState(false, price);
+    const { pricing } = this.state.filters;
+
+    if ( pricing.includes(price) ) {
+      this.setState({
+        filters: {
+          openNow: this.state.filters.openNow,
+          pricing: pricing.filter((priceInState) => priceInState !== price),
+        }
+      })
+    } else {
+      this.setState({
+        filters: {
+          openNow: this.state.filters.openNow,
+          pricing: [...pricing, price],
+        }
+      });
+    }
   }
 
-  setFilterState(open, price) {
+  filterPlaces() {
+    console.log('test Func called');
     const { openNow, pricing } = this.state.filters;
-    
-    this.setState({
-      filters: {
-        openNow: open,
-        pricing: price,
-      },
-    })
+    this.placesToFilter = this.state.places;
+    console.log('pricing', pricing)
+    if (openNow && pricing.length) {
+      this.placesToFilter = this.state.places.filter((place) => {
+        if (place) {
+          if ( pricing.includes(place.price_level) && place.opening_hours.open_now) {
+            return place;
+          }
+        }
+      });
+    }
+
+    else if (openNow) {
+      this.placesToFilter = this.state.places.filter((place) => {
+        return place.opening_hours.open_now
+      });
+    }
+
+    else if (pricing.length) {
+      this.placesToFilter = this.state.places.filter((place) => {
+        if ( pricing.includes(place.price_level) ) {
+          return place;
+        }
+      });
+    }
+
+    console.log('this.placesToFilter==', this.placesToFilter)
   }
   
   render() {
     console.log('this.state', this.state.filters)
-    const { openNow, pricing } = this.state.filters;
-    let filteredPlaces = this.state.places;
-    
-    if (openNow && pricing) {
-      filteredPlaces = this.state.places.filter((place) => 
-        place.opening_hours.open_now && place.price_level === pricing
-      );
-    }
-
-    if (openNow) {
-      filteredPlaces = this.state.places.filter((place) => place.opening_hours.open_now);
-    }
-
-    if (pricing) {
-      filteredPlaces = this.state.places.filter((place) => place.price_level === pricing);
-    }
-
+    this.filterPlaces();
     return (
       <div className="App">
         <header className="App-header">
@@ -217,30 +251,37 @@ class App extends Component {
         </header>
 
         <div className="container">
-          <div className="row">
-            <div className="col-sm-6">
+          <div className="row row-margin">
+            <div className="col-md-8">
               <SearchPlacesInput 
                 handleChange={this.handleChange} 
                 handleSubmit={this.handleSubmit}
               />
             </div>
-            <div className="col-sm-6">
-              <Filters 
+            <div className="col-md-4">
+            {this.placesToFilter.length 
+              ? <Filters 
                 displayAll={this.displayAll}
                 displayOpenNow={this.displayOpenNow}
                 filterPrice={this.filterPrice}
-              />
+                openNowButtonActive={this.state.filters.openNow}
+                filterButtonsActive={this.state.filters.pricing}/>
+              : null
+            }
             </div>
           </div>
-          <div className="row">
-            <div className="col-sm-8">
+          <div className="row row-margin">
+            <div className="col-md-8">
               <div className="map" ref={(domEl) => {this.mapElementRef = domEl}}>
-                Loading...
+              <div>
+                <img src={logo} className="App-logo" alt="logo" />
+                <h5>Initializing your location...</h5>
+              </div>
               </div>
             </div>
-            <div className="col-sm-4">
+            <div className="col-md-4">
               <PlacesList 
-                places={filteredPlaces} 
+                places={this.placesToFilter}
                 displayInfoFromListItem={this.displayInfoFromListItem}
               />
             </div>
