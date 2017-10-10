@@ -8,14 +8,14 @@ const PlacesList = ({places, displayInfoFromListItem}) => {
 
   return (
     <div className="list-group places-content">
-      {places.map((place, i) =>
+      {places.length ? places.map((place, i) =>
         <PlacesListItem 
           key={i} 
           index={i} 
           place={place} 
           displayInfoFromListItem={displayInfoFromListItem}
         />
-      )}
+      ) : null}
     </div>
   )
 }
