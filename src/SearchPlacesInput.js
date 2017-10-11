@@ -8,15 +8,12 @@ const SearchPlacesInput = ({handleSubmit, handleChange}) => {
       <FormGroup>
         <FormControl 
           type="text"
-          placeholder="Search Place Here..."
+          placeholder="Search"
           onChange={handleChange}
           required
         />
       </FormGroup>
     {' '}
-      <Button type="submit">
-        Search
-      </Button>
     </Form>
   )
 }
