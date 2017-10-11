@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 
+//Components
 import SearchPlacesInput from './SearchPlacesInput';
 import PlacesList from './PlacesList';
 import Filters from './Filters';
 
-import './App.css';
+//Assets
+import loadingLogo from './images/loading_icon.png';
+import googleLogo from './images/google_places_logo.png';
 
+//CSS
+import './App.css';
 
 class App extends Component {
   constructor(props) {
@@ -61,7 +65,7 @@ class App extends Component {
     const center = new window.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng);
     
     const mapOpts = {
-      zoom: 12,
+      zoom: 14,
       center,
     };
 
@@ -113,12 +117,27 @@ class App extends Component {
   }
 
   displayResults(places) {
+    if (this.state.markers.length) {
+      this.removePreviousMarkers();
+    }
+
     this.getMarkers(places);
-    this.setState({ places });
+    this.setState({ 
+      places,
+    });
+  }
+
+  removePreviousMarkers() {
+    this.state.markers.forEach((marker) => {
+      marker.setMap(null);
+    });
+
+    this.setState({
+      markers: [],
+    });
   }
 
   getMarkers(places) {
-    // const { pricing } = this.state.filters;
     const markers = places.map((place) => {
       return this.setMarkers(place)
     });
@@ -128,22 +147,20 @@ class App extends Component {
     this.setState({ markers });
   }
 
-  setMarkers(place) {
+  setMarkers(place, remove) {
     const contentString = `
-      <div class="container">
         <div class="row">
           <div class="col-xs-12">
             <h5>${place.name}</h5>
             <p>${place.formatted_address}</p>
           </div>
         </div>
-      </div>
     `;
 
     const marker = new window.google.maps.Marker({
       position: place.geometry.location,
       title: place.name,
-      map: this.map,
+      map: remove ? null : this.map,
     });
 
     new window.google.maps.event.addListener(marker, 'click', () => {
@@ -155,11 +172,13 @@ class App extends Component {
     return marker;
   }
 
+
   displayInfoFromListItem = (idx) => {
     const { markers } = this.state;
     new window.google.maps.event.trigger(markers[idx], 'click');
   }
 
+  // Post MVP filters
   displayAll = () => {
     this.setState({
       filters: {
@@ -171,13 +190,11 @@ class App extends Component {
 
   displayOpenNow = () => {
     const { openNow, pricing } = this.state.filters;
-    // this.getMarkers([]);
 
     if (openNow) {
       this.filteredPlaces = this.state.places.filter((place) => {
         return place.opening_hours.open_now;
       });
-      this.getMarkers(this.filteredPlaces);
     }
 
     this.setState({
@@ -186,6 +203,8 @@ class App extends Component {
         pricing: pricing,
       }
     });
+
+    this.filterPlaces();
   }
 
   filterPrice = (price) => {
@@ -209,12 +228,11 @@ class App extends Component {
   }
 
   filterPlaces() {
-    console.log('test Func called');
     const { openNow, pricing } = this.state.filters;
-    this.placesToFilter = this.state.places;
-    console.log('pricing', pricing)
+    let placesToFilter = this.state.places;
+
     if (openNow && pricing.length) {
-      this.placesToFilter = this.state.places.filter((place) => {
+      placesToFilter = this.state.places.filter((place) => {
         if (place) {
           if ( pricing.includes(place.price_level) && place.opening_hours.open_now) {
             return place;
@@ -224,70 +242,51 @@ class App extends Component {
     }
 
     else if (openNow) {
-      this.placesToFilter = this.state.places.filter((place) => {
+      placesToFilter = this.state.places.filter((place) => {
         return place.opening_hours.open_now
       });
     }
 
     else if (pricing.length) {
-      this.placesToFilter = this.state.places.filter((place) => {
+      placesToFilter = this.state.places.filter((place) => {
         if ( pricing.includes(place.price_level) ) {
           return place;
         }
       });
     }
-
-    console.log('this.placesToFilter==', this.placesToFilter)
+    this.setState({
+      filteredPlaces: placesToFilter
+    });
   }
   
   render() {
-    console.log('this.state', this.state.filters)
-    this.filterPlaces();
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to Places</h1>
+      <div className="app">
+        <header className="app-header">
+          <img src={googleLogo} className="app-logo-static" alt="logo" />
+          <h1 className="app-title">Welcome to Places</h1>
+          <SearchPlacesInput 
+            handleChange={this.handleChange} 
+            handleSubmit={this.handleSubmit}
+          />
         </header>
-
-        <div className="container">
-          <div className="row row-margin">
-            <div className="col-md-8">
-              <SearchPlacesInput 
-                handleChange={this.handleChange} 
-                handleSubmit={this.handleSubmit}
-              />
-            </div>
-            <div className="col-md-4">
-            {this.placesToFilter.length 
-              ? <Filters 
-                displayAll={this.displayAll}
-                displayOpenNow={this.displayOpenNow}
-                filterPrice={this.filterPrice}
-                openNowButtonActive={this.state.filters.openNow}
-                filterButtonsActive={this.state.filters.pricing}/>
-              : null
-            }
-            </div>
-          </div>
-          <div className="row row-margin">
-            <div className="col-md-8">
-              <div className="map" ref={(domEl) => {this.mapElementRef = domEl}}>
-              <div>
-                <img src={logo} className="App-logo" alt="logo" />
+        <div className="row">
+          <div className={`no-padding ${this.state.places.length ? 'col-md-8' : 'col-md-12'}`}>
+            <div className="map" ref={(domEl) => {this.mapElementRef = domEl}}>
+              <div className="init-loading">
+                <img src={loadingLogo} className="app-logo" alt="logo" />
                 <h5>Initializing your location...</h5>
               </div>
-              </div>
             </div>
-            <div className="col-md-4">
+          </div>
+            <div className={`no-padding ${this.state.places.length ? 'col-md-4' : ''}`}>
               <PlacesList 
-                places={this.placesToFilter}
+                places={this.state.places}
                 displayInfoFromListItem={this.displayInfoFromListItem}
               />
             </div>
           </div>
-        </div>
-      </div>
+       </div>
     );
   }
 }
