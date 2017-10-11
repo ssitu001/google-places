@@ -1,6 +1,6 @@
 import React from 'react';
 
-import PlacesListItem from './PlacesListItem';
+import PlacesListItem from '../PlacesListItem/PlacesListItem';
 
 import './PlacesList.css';
 

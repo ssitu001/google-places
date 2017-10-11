@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders SearchPlacesInput component as expected 1`] = `
+<Form
+  bsClass="form"
+  componentClass="form"
+  horizontal={false}
+  inline={true}
+>
+  <FormGroup
+    bsClass="form-group"
+  >
+    <FormControl
+      bsClass="form-control"
+      componentClass="input"
+      placeholder="Search"
+      required={true}
+      type="text"
+    />
+  </FormGroup>
+   
+</Form>
+`;

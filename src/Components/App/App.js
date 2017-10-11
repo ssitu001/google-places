@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 
 //Components
-import SearchPlacesInput from './SearchPlacesInput';
-import PlacesList from './PlacesList';
-import Filters from './Filters';
+import SearchPlacesInput from '../SearchPlacesInput/SearchPlacesInput';
+import PlacesList from '../PlacesList/PlacesList';
 
 //Assets
-import loadingLogo from './images/loading_icon.png';
-import googleLogo from './images/google_places_logo.png';
+import loadingLogo from '../../images/loading_icon.png';
+import googleLogo from '../../images/google_places_logo.png';
 
 //CSS
 import './App.css';
