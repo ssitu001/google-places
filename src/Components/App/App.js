@@ -25,7 +25,13 @@ class App extends Component {
         pricing: [],
       },
       filteredPlaces: [],
+      errorLocation: false,
+      errorResults: false,
     };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.displayInfoFromListItem = this.displayInfoFromListItem.bind(this);
   }
 
   componentDidMount() {
@@ -45,6 +51,7 @@ class App extends Component {
             currentLocation: {
               lat: pos.coords.latitude,
               lng: pos.coords.longitude,
+              errorLocation: false,
             }
           });
         })
@@ -52,7 +59,10 @@ class App extends Component {
           this.loadMap();
         })
         .catch((err) => {
-          console.log('err::::', err);
+          console.log('err', err)
+          this.setState({
+            errorLocation: true,
+          });
         });
     }
     else {
@@ -69,24 +79,24 @@ class App extends Component {
     };
 
     this.map = new window.google.maps.Map(this.mapElementRef, mapOpts);
+    this.placesService = new window.google.maps.places.PlacesService(this.map);
+    this.location = new window.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng);
   }
   
-  handleChange = (e) => {
+  handleChange(e) {
     this.setState({ place: e.target.value });
   }
   
-  handleSubmit = (e) => {
+  handleSubmit(e) {
     e.preventDefault();
     this.searchPlaces();
   }
 
   searchPlaces() {
-    this.placesService = new window.google.maps.places.PlacesService(this.map);
-    const location = new window.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng);
     const placeToQuery = this.state.place;
     const cachedResults = JSON.parse(localStorage.getItem(placeToQuery));
     const request = {
-      location: location,
+      location: this.location,
       query: placeToQuery,
       radius: '100',
     }
@@ -101,10 +111,17 @@ class App extends Component {
     } else {
       this.placesService.textSearch(request, (results, status) => {
         if (status === 'OK') {
-          console.log('results::', results);
           this.cacheResults(request.query, results);
+
+          if (this.state.errorResults) {
+            this.setState({
+              errorResults: false,
+            });
+          }
         } else {
-          console.log('error yo')
+          this.setState({
+            errorResults: true,
+          });
         }
       });
     }
@@ -172,7 +189,7 @@ class App extends Component {
   }
 
 
-  displayInfoFromListItem = (idx) => {
+  displayInfoFromListItem(idx) {
     const { markers } = this.state;
     new window.google.maps.event.trigger(markers[idx], 'click');
   }
@@ -273,8 +290,10 @@ class App extends Component {
           <div className={`no-padding ${this.state.places.length ? 'col-md-8' : 'col-md-12'}`}>
             <div className="map" ref={(domEl) => {this.mapElementRef = domEl}}>
               <div className="init-loading">
-                <img src={loadingLogo} className="app-logo" alt="logo" />
-                <h5>Initializing your location...</h5>
+                { (!this.state.errorLocation || !this.state.errorResults) ? <img src={loadingLogo} className="app-logo" alt="logo" /> : null }
+                { this.state.errorLocation ? <h5>Sorry, unable to find your location</h5> : null }
+                { this.state.errorResults ? <h5>Sorry, unable to location results for your search</h5> : null }
+                { (!this.state.errorLocation || !this.state.errorResults) ? <h5>Initializing your location...</h5> : null }
               </div>
             </div>
           </div>
