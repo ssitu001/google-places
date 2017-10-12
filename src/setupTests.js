@@ -6,3 +6,16 @@ configure({ adapter: new Adapter() });
 global.shallow = shallow;
 global.render = render;
 global.mount = mount;
+
+//Stubs
+global.google = {
+  maps: {
+    places: {
+      PlaceServices: () => {},
+    },
+    LatLng: () => {},
+  },
+};
+global.localStorage = {
+  getItem: jest.fn(),
+}
