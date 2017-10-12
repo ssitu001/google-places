@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render PLaceListItem with alternate background 1`] = `
+<div
+  className="list-group-item list-group-item-alternate"
+  onClick={[Function]}
+>
+  <h5
+    className="list-group-item-heading"
+  >
+    Place1
+  </h5>
+  <p>
+    123 Fake St
+  </p>
+</div>
+`;
+
+exports[`render PLaceListItem with no background 1`] = `
+<div
+  className="list-group-item "
+  onClick={[Function]}
+>
+  <h5
+    className="list-group-item-heading"
+  >
+    Place1
+  </h5>
+  <p>
+    123 Fake St
+  </p>
+</div>
+`;
+
+exports[`renders PlacesListItem component as expected 1`] = `
+<div
+  className="list-group-item "
+  onClick={[Function]}
+>
+  <h5
+    className="list-group-item-heading"
+  >
+    Place1
+  </h5>
+  <p>
+    123 Fake St
+  </p>
+</div>
+`;
