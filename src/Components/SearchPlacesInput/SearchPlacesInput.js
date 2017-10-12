@@ -1,20 +1,20 @@
 import React from 'react';
-import { ButtonGroup, Button, Form, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
 const SearchPlacesInput = ({handleSubmit, handleChange}) => {
 
   return (
-    <Form inline onSubmit={handleSubmit}>
-      <FormGroup>
-        <FormControl 
-          type="text"
-          placeholder="Search"
-          onChange={handleChange}
-          required
-        />
-      </FormGroup>
-    {' '}
-    </Form>
+    <div className="row">
+      <div className="col-md-12">
+        <form className="form-inline" onSubmit={handleSubmit}>
+          <input type="text"
+            className="form-control input-md"
+            onChange={handleChange}
+            id="place"
+            placeholder="Search"
+            required/>
+        </form>
+      </div>
+    </div>
   )
 }
 
