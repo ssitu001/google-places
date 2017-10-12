@@ -1,6 +1,126 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`it should display full map when there are no places 1`] = `
+exports[`<App /> it should display error message when unable to find results 1`] = `
+<div
+  className="app"
+>
+  <header
+    className="app-header"
+  >
+    <img
+      alt="logo"
+      className="app-logo-static"
+      src="google_places_logo.png"
+    />
+    <h1
+      className="app-title"
+    >
+      Welcome to Places
+    </h1>
+    <SearchPlacesInput
+      handleChange={[Function]}
+      handleSubmit={[Function]}
+    />
+  </header>
+  <div
+    className="row"
+  >
+    <div
+      className="no-padding col-md-12"
+    >
+      <div
+        className="map"
+      >
+        <div
+          className="init-loading"
+        >
+          <img
+            alt="logo"
+            className="app-logo"
+            src="loading_icon.png"
+          />
+          <h5>
+            Sorry, unable to location results for your search
+          </h5>
+          <h5>
+            Initializing your location...
+          </h5>
+        </div>
+      </div>
+    </div>
+    <div
+      className="no-padding "
+    >
+      <PlacesList
+        displayInfoFromListItem={[Function]}
+        places={Array []}
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<App /> it should display error message when unable to find user location 1`] = `
+<div
+  className="app"
+>
+  <header
+    className="app-header"
+  >
+    <img
+      alt="logo"
+      className="app-logo-static"
+      src="google_places_logo.png"
+    />
+    <h1
+      className="app-title"
+    >
+      Welcome to Places
+    </h1>
+    <SearchPlacesInput
+      handleChange={[Function]}
+      handleSubmit={[Function]}
+    />
+  </header>
+  <div
+    className="row"
+  >
+    <div
+      className="no-padding col-md-12"
+    >
+      <div
+        className="map"
+      >
+        <div
+          className="init-loading"
+        >
+          <img
+            alt="logo"
+            className="app-logo"
+            src="loading_icon.png"
+          />
+          <h5>
+            Sorry, unable to find your location
+          </h5>
+          <h5>
+            Initializing your location...
+          </h5>
+        </div>
+      </div>
+    </div>
+    <div
+      className="no-padding "
+    >
+      <PlacesList
+        displayInfoFromListItem={[Function]}
+        places={Array []}
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<App /> it should display full map when there are no places 1`] = `
 <div
   className="app"
 >
@@ -57,7 +177,7 @@ exports[`it should display full map when there are no places 1`] = `
 </div>
 `;
 
-exports[`it should display partial map when there are places 1`] = `
+exports[`<App /> it should display partial map when there are places 1`] = `
 <div
   className="app"
 >
@@ -120,7 +240,127 @@ exports[`it should display partial map when there are places 1`] = `
 </div>
 `;
 
-exports[`renders App component as expected 1`] = `
+exports[`<App /> it should not display spinner and initializing message when unable to find results or user location 1`] = `
+<div
+  className="app"
+>
+  <header
+    className="app-header"
+  >
+    <img
+      alt="logo"
+      className="app-logo-static"
+      src="google_places_logo.png"
+    />
+    <h1
+      className="app-title"
+    >
+      Welcome to Places
+    </h1>
+    <SearchPlacesInput
+      handleChange={[Function]}
+      handleSubmit={[Function]}
+    />
+  </header>
+  <div
+    className="row"
+  >
+    <div
+      className="no-padding col-md-12"
+    >
+      <div
+        className="map"
+      >
+        <div
+          className="init-loading"
+        >
+          <img
+            alt="logo"
+            className="app-logo"
+            src="loading_icon.png"
+          />
+          <h5>
+            Sorry, unable to location results for your search
+          </h5>
+          <h5>
+            Initializing your location...
+          </h5>
+        </div>
+      </div>
+    </div>
+    <div
+      className="no-padding "
+    >
+      <PlacesList
+        displayInfoFromListItem={[Function]}
+        places={Array []}
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<App /> it should not display spinner and initializing message when unable to find results or user location 2`] = `
+<div
+  className="app"
+>
+  <header
+    className="app-header"
+  >
+    <img
+      alt="logo"
+      className="app-logo-static"
+      src="google_places_logo.png"
+    />
+    <h1
+      className="app-title"
+    >
+      Welcome to Places
+    </h1>
+    <SearchPlacesInput
+      handleChange={[Function]}
+      handleSubmit={[Function]}
+    />
+  </header>
+  <div
+    className="row"
+  >
+    <div
+      className="no-padding col-md-12"
+    >
+      <div
+        className="map"
+      >
+        <div
+          className="init-loading"
+        >
+          <img
+            alt="logo"
+            className="app-logo"
+            src="loading_icon.png"
+          />
+          <h5>
+            Sorry, unable to find your location
+          </h5>
+          <h5>
+            Initializing your location...
+          </h5>
+        </div>
+      </div>
+    </div>
+    <div
+      className="no-padding "
+    >
+      <PlacesList
+        displayInfoFromListItem={[Function]}
+        places={Array []}
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<App /> renders App component as expected 1`] = `
 <div
   className="app"
 >
