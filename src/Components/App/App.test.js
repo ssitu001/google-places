@@ -1,9 +1,11 @@
 import React from 'react';
 import toJson from 'enzyme-to-json';
+import sinon from 'sinon';
 
 import App from './App';
 import SearchPlacesInput from '../SearchPlacesInput/SearchPlacesInput';
 import PlacesList from '../PlacesList/PlacesList';
+import PlacesListItem from '../PlacesListItem/PlacesListItem';
 
 test('renders App component as expected', () => {
   const component = shallow(<App />);
@@ -21,12 +23,22 @@ test('it contains the <PlacesList /> component', () => {
   expect(component.find(PlacesList).length).toEqual(1);
 });
 
-test('it renders props correctly', () => {
-  const component = shallow(<App test='test'/>);
-  expect(component.instance().props.test).toBe('test');
+test('it should display full map when there are no places', () => {
+  const component = shallow(<App />);
+  component.setState({
+    places: [],
+  });
+  
+  const tree = toJson(component);
+  expect(tree).toMatchSnapshot();
 });
 
-test('it should have an element to display the map', () => {
+test('it should display partial map when there are places', () => {
   const component = shallow(<App />);
-  expect(component.find('.map').length).toEqual(1);
+  component.setState({
+    places: [{}, {}, {}],
+  });
+  
+  const tree = toJson(component);
+  expect(tree).toMatchSnapshot();
 });
