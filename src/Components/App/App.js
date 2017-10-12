@@ -80,7 +80,7 @@ class App extends Component {
     this.searchPlaces();
   }
 
-  searchPlaces(distance) {
+  searchPlaces() {
     this.placesService = new window.google.maps.places.PlacesService(this.map);
     const location = new window.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng);
     const placeToQuery = this.state.place;
